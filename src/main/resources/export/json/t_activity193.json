@@ -1,0 +1,8 @@
+[
+	{"activityId":"10156","product":"1#11249999#5","cost":"2#29#0","name":"调料信物","maxOnce":"1","id":"1","type":"1:40_10","maxCount":"1"},
+	{"activityId":"10156","product":"2#11#30","cost":"2#29#0","name":"膳具碎片·御","maxOnce":"1","id":"2","type":"1:40_50","maxCount":"1"},
+	{"activityId":"10156","product":"1#11300010#1","cost":"2#29#0","name":"珍品食魂礼包","maxOnce":"1","id":"3","type":"1:40_100","maxCount":"1"},
+	{"activityId":"10156","product":"1#11240096#5","cost":"2#29#0","name":"素蒸音声部信物","maxOnce":"1","id":"4","type":"1:40_150","maxCount":"1"},
+	{"activityId":"10156","product":"4#2097#1","cost":"2#29#240","name":"新风鳗鲞","maxOnce":"1","id":"5","type":"1:40_240","maxCount":"1"},
+	{"activityId":"10156","product":"4#2096#1","cost":"2#29#300","name":"素蒸音声部","maxOnce":"1","id":"6","type":"1:40_300","maxCount":"1"}
+]
