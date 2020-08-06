@@ -26,7 +26,7 @@ public class ExcelExportUtil {
 	 * @throws IOException
 	 * @throws InvalidFormatException
 	 */
-	public static void excel2JsonAndClass(String fileName, String configName) throws IOException, InvalidFormatException {
+	public static void excel2JsonAndClass(String fileName, String configName) throws Exception {
 		File file = new File(fileName);
 		if (!file.exists()){
 			throw new RuntimeException("不存在文件:" + fileName);
@@ -42,7 +42,7 @@ public class ExcelExportUtil {
 	 * @throws IOException
 	 * @throws InvalidFormatException
 	 */
-	private static void excel2JsonAndClass(File file, IConfig config) throws IOException, InvalidFormatException {
+	private static void excel2JsonAndClass(File file, IConfig config) throws Exception {
 		XSSFWorkbook workbook = new XSSFWorkbook(file);
 		int numberOfSheets = workbook.getNumberOfSheets();
 		int firstIndex = config.getInt("fields.firstIndex");
@@ -68,11 +68,10 @@ public class ExcelExportUtil {
 			if (sheetName.indexOf("export_") != 0){
 				continue;
 			}
-			int numberOfRows = sheet.getLastRowNum() + 1;
-			if (numberOfRows < lastIndex){
+			if (sheet.getLastRowNum() < lastIndex){
 				throw new RuntimeException(String.format("页签: %s.%s 行数小于%s,格式错误", file.getName(), sheetName, lastIndex));
 			}
-			String jsonFileName = ExcelCellUtil.readString(sheet.getRow(0).getCell(0));
+			String jsonFileName = ExcelCellConvertUtil.readString(sheet.getRow(0).getCell(0));
 			int primaryIndex = config.getInt("fields.primaryIndex");
 			List<ExcelFieldConfig> fieldConfigs = ExcelFieldConfig.readExcelSheet(sheet, primaryIndex, firstIndex, lastIndex);
 			excel2Json(sheet, lastIndex, fieldConfigs, jsonFileName, jsonDirectory);
@@ -88,37 +87,36 @@ public class ExcelExportUtil {
 	 * @param jsonDirectory
 	 * @throws IOException
 	 */
-	private static void excel2Json(XSSFSheet sheet, int firstIndex, List<ExcelFieldConfig> fieldConfigs, String jsonFileName, String jsonDirectory) throws IOException {
-		int numberOfRows = sheet.getLastRowNum() + 1;
-		List<List<String>> excelStringList = new ArrayList<>();
-		for (int rowIndex = firstIndex; rowIndex < numberOfRows; rowIndex++) {
+	private static void excel2Json(XSSFSheet sheet, int firstIndex, List<ExcelFieldConfig> fieldConfigs, String jsonFileName, String jsonDirectory) throws Exception {
+		List<List<Object>> excelReadConfigValueList = new ArrayList<>();
+		for (int rowIndex = firstIndex; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
 			XSSFRow row = sheet.getRow(rowIndex);
 			if (row == null){
 				continue;	//存在空行
 			}
-			List<String> stringList = new ArrayList<>();
+			List<Object> readConfigValueList = new ArrayList<>();
 			for (ExcelFieldConfig fieldConfig : fieldConfigs) {
-				XSSFCell cell = row.getCell(fieldConfig.getIndex());
-				String readString = ExcelCellUtil.readString(cell);
-				if (fieldConfig.getIndex() == 0 && StringUtil.isEmpty(readString)){
-					stringList.clear();
+				XSSFCell xssfCell = row.getCell(fieldConfig.getIndex());
+				if (fieldConfig.getIndex() == 0 && StringUtil.isEmpty(ExcelCellConvertUtil.readString(xssfCell))){
+					readConfigValueList.clear();
 					break;
 				}
 				else {
-					stringList.add(readString);
+					Object readConfigValue = ExcelCellConvertUtil.readConfigValue(xssfCell, fieldConfig);
+					readConfigValueList.add(readConfigValue);
 				}
 			}
-			if (!stringList.isEmpty()){
-				excelStringList.add(stringList);
+			if (!readConfigValueList.isEmpty()){
+				excelReadConfigValueList.add(readConfigValueList);
 			}
 		}
 
 		StringBuilder builder = new StringBuilder("[");
-		for (int i = 0; i < excelStringList.size(); i++) {
+		for (int i = 0; i < excelReadConfigValueList.size(); i++) {
 			JSONObject jsonObject = new JSONObject();
-			List<String> stringList = excelStringList.get(i);
+			List<Object> readConfigValueList = excelReadConfigValueList.get(i);
 			for (ExcelFieldConfig fieldConfig : fieldConfigs) {
-				jsonObject.put(fieldConfig.getName(), stringList.get(fieldConfig.getIndex()));
+				jsonObject.put(fieldConfig.getName(), readConfigValueList.get(fieldConfig.getIndex()));
 			}
 			if (i > 0){
 				builder.append(",");

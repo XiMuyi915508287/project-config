@@ -15,6 +15,7 @@ dependencies {
 
     compile project(':game-core')
 
+    compile group: 'org.jodd', name: 'jodd-core', version:'4.3.1'
     compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
 
 

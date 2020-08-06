@@ -52,19 +52,24 @@ public class ExcelFieldConfig {
 		return annotation;
 	}
 
-	public static List<ExcelFieldConfig> readExcelSheet(XSSFSheet sheet, int primaryKeyIndex, int firstIndex, int lastIndex){
-		int numberOfCells = sheet.getRow(firstIndex - 1).getPhysicalNumberOfCells();
+	public static List<ExcelFieldConfig> readExcelSheet(XSSFSheet sheet, int primaryKeyIndex, int firstIndex, int lastIndex) throws Exception {
+		XSSFRow firstXssRow = sheet.getRow(firstIndex - 1);
+		int numberOfCells = firstXssRow.getLastCellNum();
 		List<ExcelFieldConfig> fieldConfigs = new ArrayList<>();
 		for (int number = 0; number < numberOfCells; number++) {
+			String name = ExcelCellConvertUtil.readString(firstXssRow.getCell(number));
+			if (StringUtil.isEmpty(name)){
+				continue;	//空列
+			}
 			List<String> nameList = new ArrayList<>();
 			for (int index = firstIndex - 1; index < lastIndex; index++) {
-				XSSFRow row = sheet.getRow(index);
-				nameList.add(ExcelCellUtil.readString(row.getCell(number)));
+				XSSFRow xssfRow = sheet.getRow(index);
+				nameList.add(ExcelCellConvertUtil.readString(xssfRow.getCell(number)));
 			}
 			boolean isPrimaryKey = false;
 			XSSFCell cell = sheet.getRow(primaryKeyIndex - 1).getCell(number);
 			if (cell != null){
-				String readString = ExcelCellUtil.readString(cell);
+				String readString = ExcelCellConvertUtil.readString(cell);
 				if (!StringUtil.isEmpty(readString)){
 					if (readString.trim().equals("PrimaryKey")){
 						isPrimaryKey = true;
