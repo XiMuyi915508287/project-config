@@ -15,7 +15,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ExcelExportUtil {
 
@@ -88,35 +90,35 @@ public class ExcelExportUtil {
 	 * @throws IOException
 	 */
 	private static void excel2Json(XSSFSheet sheet, int firstIndex, List<ExcelFieldConfig> fieldConfigs, String jsonFileName, String jsonDirectory) throws Exception {
-		List<List<Object>> excelReadConfigValueList = new ArrayList<>();
+		List<Map<ExcelFieldConfig, Object>> excelReadConfigValueList = new ArrayList<>();
 		for (int rowIndex = firstIndex; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
 			XSSFRow row = sheet.getRow(rowIndex);
 			if (row == null){
 				continue;	//存在空行
 			}
-			List<Object> readConfigValueList = new ArrayList<>();
+			Map<ExcelFieldConfig, Object> readConfigValueMap = new HashMap<>();
 			for (ExcelFieldConfig fieldConfig : fieldConfigs) {
 				XSSFCell xssfCell = row.getCell(fieldConfig.getIndex());
 				if (fieldConfig.getIndex() == 0 && StringUtil.isEmpty(ExcelCellConvertUtil.readString(xssfCell))){
-					readConfigValueList.clear();
+					readConfigValueMap.clear();
 					break;
 				}
 				else {
 					Object readConfigValue = ExcelCellConvertUtil.readConfigValue(xssfCell, fieldConfig);
-					readConfigValueList.add(readConfigValue);
+					readConfigValueMap.put(fieldConfig, readConfigValue);
 				}
 			}
-			if (!readConfigValueList.isEmpty()){
-				excelReadConfigValueList.add(readConfigValueList);
+			if (!readConfigValueMap.isEmpty()){
+				excelReadConfigValueList.add(readConfigValueMap);
 			}
 		}
 
 		StringBuilder builder = new StringBuilder("[");
 		for (int i = 0; i < excelReadConfigValueList.size(); i++) {
 			JSONObject jsonObject = new JSONObject();
-			List<Object> readConfigValueList = excelReadConfigValueList.get(i);
+			Map<ExcelFieldConfig, Object> readConfigValueMap = excelReadConfigValueList.get(i);
 			for (ExcelFieldConfig fieldConfig : fieldConfigs) {
-				jsonObject.put(fieldConfig.getName(), readConfigValueList.get(fieldConfig.getIndex()));
+				jsonObject.put(fieldConfig.getName(), readConfigValueMap.get(fieldConfig));
 			}
 			if (i > 0){
 				builder.append(",");
