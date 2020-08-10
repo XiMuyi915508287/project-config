@@ -12,7 +12,6 @@ public class ExcelListConverter extends ExcelCellConverter {
 		this.cellConverter = cellConverter;
 	}
 
-
 	@Override
 	protected Object string2ClassValue(String string) throws Exception {
 		int indexOf = string.indexOf("[");

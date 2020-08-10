@@ -4,6 +4,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.game.common.config.ConfigUtil;
 import com.game.common.config.IConfig;
+import com.game.common.util.DateFormatUtil;
+import com.project.config.export.ModelExportEntry;
+import com.project.config.export.ModelExportField;
+import com.project.config.export.ModelFieldConfig;
+import com.project.config.export.ModelTypeConfig;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import jodd.util.StringUtil;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -14,7 +22,10 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,13 +39,13 @@ public class ExcelExportUtil {
 	 * @throws IOException
 	 * @throws InvalidFormatException
 	 */
-	public static void excel2JsonAndClass(String fileName, String configName) throws Exception {
+	public static void exportExcel2JsonAndClass(String fileName, String configName) throws Exception {
 		File file = new File(fileName);
 		if (!file.exists()){
 			throw new RuntimeException("不存在文件:" + fileName);
 		}
 		IConfig config = ConfigUtil.loadConfig(configName);
-		excel2JsonAndClass(file, config);
+		exportExcel2JsonAndClass(file, config);
 	}
 
 	/**
@@ -44,15 +55,76 @@ public class ExcelExportUtil {
 	 * @throws IOException
 	 * @throws InvalidFormatException
 	 */
-	private static void excel2JsonAndClass(File file, IConfig config) throws Exception {
+	private static void exportExcel2JsonAndClass(File file, IConfig config) throws Exception {
 		XSSFWorkbook workbook = new XSSFWorkbook(file);
 		int numberOfSheets = workbook.getNumberOfSheets();
-		int firstIndex = config.getInt("fields.firstIndex");
-		int lastIndex = config.getInt("fields.lastIndex");
-		if (lastIndex - firstIndex + 1 != ExcelFieldConfig.Count) {
+		int firstIndex = config.getInt("field.firstIndex");
+		int lastIndex = config.getInt("field.lastIndex");
+		if (lastIndex - firstIndex + 1 != ModelFieldConfig.Count) {
 			throw new RuntimeException(String.format("字段信息行数错误:%s-%s", firstIndex, lastIndex));
 		}
-		String jsonDirectory = config.getString("jsonPath");
+		String jsonDirectory = checkAndGetDirectory(config, "jsonPath");
+		for (int index = 0; index < numberOfSheets; index++) {
+			XSSFSheet sheet = workbook.getSheetAt(index);
+			String sheetName = sheet.getSheetName();
+			if (sheetName.indexOf("export_") != 0){
+				continue;
+			}
+			if (sheet.getLastRowNum() < lastIndex){
+				throw new RuntimeException(String.format("页签: %s.%s 行数小于%s,格式错误", file.getName(), sheetName, lastIndex));
+			}
+			String jsonFileName = ExcelCellConvertUtil.readString(sheet.getRow(0).getCell(0));
+			String javaClassName = ExcelCellConvertUtil.readString(sheet.getRow(0).getCell(1));
+			int primaryIndex = config.getInt("field.primaryIndex");
+			List<ModelFieldConfig> fieldConfigs = readFieldConfigList(sheet, primaryIndex, firstIndex, lastIndex);
+			exportExcel2Json(sheet, lastIndex, fieldConfigs, jsonFileName, jsonDirectory);
+			exportExcel2JavaDataClass(file.getName(), sheetName, javaClassName, fieldConfigs, config);
+		}
+	}
+
+	private static void exportExcel2JavaDataClass(String filename, String sheetName, String javaClassName, List<ModelFieldConfig> fieldConfigs, IConfig config) throws IOException, TemplateException {
+		Map<String, ModelTypeConfig> typeConfigMap = ModelTypeConfig.readTypeConfigMap(config.getConfigList("field.types"));
+		List<ModelExportField> exportFieldList = new ArrayList<>(fieldConfigs.size());
+		for (ModelFieldConfig fieldConfig : fieldConfigs) {
+			ModelExportField exportField = new ModelExportField(fieldConfig, typeConfigMap.get(fieldConfig.getType()));
+			exportFieldList.add(exportField);
+		}
+
+		Configuration configuration = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
+		URL resource = ExcelExportUtil.class.getResource("/export/config_model.ftl");
+		File resourceFile = new File(resource.getPath());
+		configuration.setDirectoryForTemplateLoading(resourceFile.getParentFile());
+		configuration.setClassicCompatible(false);
+		Template template = configuration.getTemplate(resourceFile.getName());
+
+		String javaDirectory = checkAndGetDirectory(config, "javaPath");
+		String javaPackage = config.getString("javaPackage");
+
+		javaClassName = javaClassName + "Data";
+		File file = new File(String.format("%s/%s/%s.java", javaDirectory, javaPackage.replace(".", "/"), javaClassName));
+		if (!file.getParentFile().exists()) {
+			if (!file.getParentFile().mkdirs()) {
+				throw new RuntimeException("创建文件夹失败：" + file.getParentFile().getAbsolutePath());
+			}
+		}
+
+		String annotation = "文件创建时间:" + DateFormatUtil.formatYMDHMS(new Date()) + " 创建者:" + System.getProperties().getProperty("user.name") + "\n";
+		ModelExportEntry entry = new ModelExportEntry(String.format("%s[%s]", filename, sheetName), javaClassName, exportFieldList, annotation);
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("javaPackage", javaPackage);
+		map.put("filename", entry.getFilename());
+		map.put("javaClassName", entry.getJavaClassName());
+		map.put("fieldList", entry.getFieldList());
+		map.put("annotation", entry.getAnnotation());
+		Writer writer = new FileWriter(file);
+		template.process(map, writer);
+		writer.flush();
+		writer.close();
+	}
+
+	private static String checkAndGetDirectory(IConfig config, String path){
+		String jsonDirectory = config.getString(path);
 		File directory = new File(jsonDirectory);
 		if (directory.exists()){
 			if (!directory.isDirectory()){
@@ -64,20 +136,7 @@ public class ExcelExportUtil {
 				throw new RuntimeException("创建目录失败:" + jsonDirectory);
 			}
 		}
-		for (int index = 0; index < numberOfSheets; index++) {
-			XSSFSheet sheet = workbook.getSheetAt(index);
-			String sheetName = sheet.getSheetName();
-			if (sheetName.indexOf("export_") != 0){
-				continue;
-			}
-			if (sheet.getLastRowNum() < lastIndex){
-				throw new RuntimeException(String.format("页签: %s.%s 行数小于%s,格式错误", file.getName(), sheetName, lastIndex));
-			}
-			String jsonFileName = ExcelCellConvertUtil.readString(sheet.getRow(0).getCell(0));
-			int primaryIndex = config.getInt("fields.primaryIndex");
-			List<ExcelFieldConfig> fieldConfigs = ExcelFieldConfig.readExcelSheet(sheet, primaryIndex, firstIndex, lastIndex);
-			excel2Json(sheet, lastIndex, fieldConfigs, jsonFileName, jsonDirectory);
-		}
+		return jsonDirectory;
 	}
 
 	/**
@@ -89,15 +148,15 @@ public class ExcelExportUtil {
 	 * @param jsonDirectory
 	 * @throws IOException
 	 */
-	private static void excel2Json(XSSFSheet sheet, int firstIndex, List<ExcelFieldConfig> fieldConfigs, String jsonFileName, String jsonDirectory) throws Exception {
-		List<Map<ExcelFieldConfig, Object>> excelReadConfigValueList = new ArrayList<>();
+	private static void exportExcel2Json(XSSFSheet sheet, int firstIndex, List<ModelFieldConfig> fieldConfigs, String jsonFileName, String jsonDirectory) throws Exception {
+		List<Map<ModelFieldConfig, Object>> excelReadConfigValueList = new ArrayList<>();
 		for (int rowIndex = firstIndex; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
 			XSSFRow row = sheet.getRow(rowIndex);
 			if (row == null){
 				continue;	//存在空行
 			}
-			Map<ExcelFieldConfig, Object> readConfigValueMap = new HashMap<>();
-			for (ExcelFieldConfig fieldConfig : fieldConfigs) {
+			Map<ModelFieldConfig, Object> readConfigValueMap = new HashMap<>();
+			for (ModelFieldConfig fieldConfig : fieldConfigs) {
 				XSSFCell xssfCell = row.getCell(fieldConfig.getIndex());
 				if (fieldConfig.getIndex() == 0 && StringUtil.isEmpty(ExcelCellConvertUtil.readString(xssfCell))){
 					readConfigValueMap.clear();
@@ -116,8 +175,8 @@ public class ExcelExportUtil {
 		StringBuilder builder = new StringBuilder("[");
 		for (int i = 0; i < excelReadConfigValueList.size(); i++) {
 			JSONObject jsonObject = new JSONObject();
-			Map<ExcelFieldConfig, Object> readConfigValueMap = excelReadConfigValueList.get(i);
-			for (ExcelFieldConfig fieldConfig : fieldConfigs) {
+			Map<ModelFieldConfig, Object> readConfigValueMap = excelReadConfigValueList.get(i);
+			for (ModelFieldConfig fieldConfig : fieldConfigs) {
 				jsonObject.put(fieldConfig.getName(), readConfigValueMap.get(fieldConfig));
 			}
 			if (i > 0){
@@ -133,5 +192,39 @@ public class ExcelExportUtil {
 		writer.close();
 		String absolutePath = file.getAbsolutePath();
 		System.out.println("导出JSON文件成功: " + absolutePath);
+	}
+
+
+	private static List<ModelFieldConfig> readFieldConfigList(XSSFSheet sheet, int primaryKeyIndex, int firstIndex, int lastIndex) throws Exception {
+		XSSFRow firstXssRow = sheet.getRow(firstIndex - 1);
+		int numberOfCells = firstXssRow.getLastCellNum();
+		List<ModelFieldConfig> fieldConfigs = new ArrayList<>();
+		for (int number = 0; number < numberOfCells; number++) {
+			String name = ExcelCellConvertUtil.readString(firstXssRow.getCell(number));
+			if (StringUtil.isEmpty(name)){
+				continue;	//空列
+			}
+			List<String> nameList = new ArrayList<>();
+			for (int index = firstIndex - 1; index < lastIndex; index++) {
+				XSSFRow xssfRow = sheet.getRow(index);
+				nameList.add(ExcelCellConvertUtil.readString(xssfRow.getCell(number)));
+			}
+			boolean isPrimaryKey = false;
+			XSSFCell cell = sheet.getRow(primaryKeyIndex - 1).getCell(number);
+			if (cell != null){
+				String readString = ExcelCellConvertUtil.readString(cell);
+				if (!StringUtil.isEmpty(readString)){
+					if (readString.trim().equals("PrimaryKey")){
+						isPrimaryKey = true;
+					}
+					else {
+						throw new RuntimeException("主键名字错误:" + readString);
+					}
+				}
+			}
+			ModelFieldConfig fieldConfig = new ModelFieldConfig(number, isPrimaryKey, nameList.get(0), nameList.get(1), nameList.get(2), nameList.get(3));
+			fieldConfigs.add(fieldConfig);
+		}
+		return fieldConfigs;
 	}
 }

@@ -1,5 +1,6 @@
 package com.project.config.export.excel;
 
+import com.project.config.export.ModelFieldConfig;
 import com.project.config.export.excel.convert.ExcelCellConverter;
 import com.project.config.export.excel.convert.ExcelDateConverter;
 import com.project.config.export.excel.convert.ExcelDoubleConverter;
@@ -33,7 +34,7 @@ public class ExcelCellConvertUtil {
 		converters.put(listConverter.getType(), listConverter);
 	}
 
-	public static Object readConfigValue(XSSFCell xssfCell, ExcelFieldConfig fieldConfig) throws Exception {
+	public static Object readConfigValue(XSSFCell xssfCell, ModelFieldConfig fieldConfig) throws Exception {
 		IExcelCellConverter converter = getConverter(fieldConfig.getType());
 		if (converter == null){
 			throw new UnsupportedOperationException("不支持类型:" + fieldConfig.getType());
