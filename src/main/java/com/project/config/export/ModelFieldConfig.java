@@ -5,7 +5,7 @@ public class ModelFieldConfig {
 	public static final int Count = 4;
 
 	private final int index;
-	private final boolean isPrimaryKey;
+	private final boolean primaryKey;
 	private final String type;				//字段1
 	private final String export;			//字段2
 	private final String name;				//字段3
@@ -16,7 +16,7 @@ public class ModelFieldConfig {
 
 	public ModelFieldConfig(int index, boolean isPrimaryKey, String type, String export, String name, String annotation) {
 		this.index = index;
-		this.isPrimaryKey = isPrimaryKey;
+		this.primaryKey = isPrimaryKey;
 		this.type = type;
 		this.export = export;
 		this.name = name;
@@ -30,7 +30,7 @@ public class ModelFieldConfig {
 	}
 
 	public boolean isPrimaryKey() {
-		return isPrimaryKey;
+		return primaryKey;
 	}
 
 	public String getType() {

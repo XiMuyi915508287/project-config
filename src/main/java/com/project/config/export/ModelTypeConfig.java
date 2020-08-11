@@ -10,7 +10,7 @@ public class ModelTypeConfig {
 
 	private final String type;
 	private final String typeClass;
-	private final String typeImport;
+	private String typeImport;
 
 	public ModelTypeConfig(String type, String typeClass, String typeImport) {
 		this.type = type;
@@ -29,6 +29,14 @@ public class ModelTypeConfig {
 
 	public String getTypeImport() {
 		return typeImport;
+	}
+
+	public void setTypeImport(String typeImport) {
+		this.typeImport = typeImport;
+	}
+
+	public ModelTypeConfig deepCopy(){
+		return new ModelTypeConfig(type, typeClass, typeImport);
 	}
 
 	public static Map<String, ModelTypeConfig> readTypeConfigMap(List<IConfig> configs){

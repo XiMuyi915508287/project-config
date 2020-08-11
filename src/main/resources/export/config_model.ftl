@@ -7,8 +7,11 @@ import ${field.typeConfig.typeImport};
 </#list>
 
 /**
-* 导出的文件: ${filename}, MODIFICATION IS NOT ALLOWED
-* ${annotation}
+ * MODIFICATION IS NOT ALLOWED
+ *
+ * 原文件: ${filename}, 对应JSON文件: ${name}
+ *
+ * ${annotation}
 */
 public class ${javaClassName} {
 
