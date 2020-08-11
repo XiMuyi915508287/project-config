@@ -1,6 +1,6 @@
-package com.project.config.export.excel;
+package com.project.config.export;
 
-import com.game.common.config.IConfig;
+import com.project.config.export.excel.ExcelExportUtil;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -32,21 +32,5 @@ public class TemplateExportUtil {
 		template.process(paramMap, writer);
 		writer.flush();
 		writer.close();
-	}
-
-	public static String checkAndGetDirectory(IConfig config, String path){
-		String jsonDirectory = config.getString(path);
-		File directory = new File(jsonDirectory);
-		if (directory.exists()){
-			if (!directory.isDirectory()){
-				throw new RuntimeException("不是目录类型:" + jsonDirectory);
-			}
-		}
-		else {
-			if (!directory.mkdirs()){
-				throw new RuntimeException("创建目录失败:" + jsonDirectory);
-			}
-		}
-		return jsonDirectory;
 	}
 }
