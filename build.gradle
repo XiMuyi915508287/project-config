@@ -13,7 +13,11 @@ repositories {
 
 dependencies {
 
-    compile project(':game-core')
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version:'2.2'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version:'2.2'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version:'2.2'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version:'2.2'
+    compile group: 'com.alibaba', name: 'fastjson', version:'1.2.46'
 
     compile group: 'org.jodd', name: 'jodd-core', version:'4.3.1'
     compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'

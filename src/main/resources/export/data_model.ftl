@@ -7,7 +7,7 @@ import ${field.typeConfig.typeImport};
 </#list>
 
 /**
- * MODIFICATION IS NOT ALLOWED
+ * 版本:1.0  MODIFICATION IS NOT ALLOWED
  *
  * 原文件: ${filename}, 对应JSON文件: ${name}
  *

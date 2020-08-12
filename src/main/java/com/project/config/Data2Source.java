@@ -1,7 +1,5 @@
 package com.project.config;
 
-import com.game.common.util.CommonUtil;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,18 +31,25 @@ public abstract class Data2Source<T> extends DataSource<T>{
 			DataPrimaryKey primaryKey = new DataPrimaryKey(this.primaryKey.apply(data), secondKey.apply(data));
 			primaryDataMap.put(primaryKey, data);
 		}
-		Map<Integer, List<T>> groupByKey = CommonUtil.groupByKey(new HashMap<>(), dataList, ArrayList::new, primaryKey);
-		Map<Integer, List<T>> dataListMap = new HashMap<>();
+		Map<Integer, List<T>> groupByKey = new HashMap<>();
+		for (T data : dataList) {
+			List<T> computeIfAbsent = groupByKey.computeIfAbsent(this.primaryKey.apply(data), key -> new ArrayList<>());
+			computeIfAbsent.add(data);
+		}
 		for (Map.Entry<Integer, List<T>> entry : groupByKey.entrySet()) {
 			entry.getValue().sort(Comparator.comparingInt(secondKey::apply));
 			dataListMap.put(entry.getKey(), Collections.unmodifiableList(entry.getValue()));
 		}
-		List<T> primaryDataList = primaryDataMap.entrySet().stream().sorted(Comparator.comparingLong(entry -> entry.getKey().getPrimaryLongKey()))
+		List<T> primaryDataList = primaryDataMap.entrySet().stream().sorted(Comparator.comparingLong(entry -> entry.getKey().getLongKey()))
 				.map(Map.Entry::getValue).collect(Collectors.toList());
 
 		this.primaryDataMap = primaryDataMap;
 		this.dataListMap = dataListMap;
 		this.primaryDataList = Collections.unmodifiableList(primaryDataList);
+	}
+
+	public List<T> getDataList() {
+		return primaryDataList;
 	}
 
 	public List<T> getDataList(int primaryId) {
@@ -57,9 +62,5 @@ public abstract class Data2Source<T> extends DataSource<T>{
 
 	public T getData(DataPrimaryKey primaryKey) {
 		return primaryDataMap.get(primaryKey);
-	}
-
-	public List<T> getPrimaryDataList() {
-		return primaryDataList;
 	}
 }

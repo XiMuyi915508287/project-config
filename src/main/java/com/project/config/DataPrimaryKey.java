@@ -12,7 +12,15 @@ public class DataPrimaryKey {
 		this.secondaryId = secondaryId;
 	}
 
-	public long getPrimaryLongKey(){
+	public int getPrimaryId() {
+		return primaryId;
+	}
+
+	public int getSecondaryId() {
+		return secondaryId;
+	}
+
+	public long getLongKey(){
 		return ((long)primaryId) << 32 | secondaryId;
 	}
 
