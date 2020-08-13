@@ -36,6 +36,7 @@ public abstract class Data2Source<T> extends DataSource<T>{
 			List<T> computeIfAbsent = groupByKey.computeIfAbsent(this.primaryKey.apply(data), key -> new ArrayList<>());
 			computeIfAbsent.add(data);
 		}
+		Map<Integer, List<T>> dataListMap = new HashMap<>();
 		for (Map.Entry<Integer, List<T>> entry : groupByKey.entrySet()) {
 			entry.getValue().sort(Comparator.comparingInt(secondKey::apply));
 			dataListMap.put(entry.getKey(), Collections.unmodifiableList(entry.getValue()));
