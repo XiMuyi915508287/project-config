@@ -1,6 +1,5 @@
-package com.project.config.model.ext;
+package com.project.config;
 
-import com.project.config.IDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,10 +23,10 @@ public class DataConfigUtil {
 	 * @param <K>
 	 * @return 加载失败返回 null.
 	 */
-	public static <S extends IDataSource, T, K> Map<K, T> realodConfig(S dataSource, Class<T> tClass, Function<T, K> function){
+	public static <S extends IDataSource, T, K> Map<K, T> reloadConfig(S dataSource, Class<T> tClass, Function<T, K> function){
 		Map<K, T> configs = null;
 		try {
-			Method method = dataSource.getClass().getDeclaredMethod("getDataList");
+			Method method = dataSource.getClass().getSuperclass().getDeclaredMethod("getDataList");
 			List dataList = (List) method.invoke(dataSource);
 			Map<K, T> map = new HashMap<>(dataList.size());
 			for (Object data : dataList) {

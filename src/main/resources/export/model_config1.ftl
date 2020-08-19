@@ -1,6 +1,9 @@
 package ${javaPackage};
 
+import com.project.config.DataConfigUtil;
+
 import ${javaDataPackage}.${javaDataClassName};
+import ${javaDataPackage}.${javaSourceClassName};
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -10,7 +13,7 @@ import java.util.stream.Collectors;
 
 <#list fieldList as field>
     <#if field.typeConfig.typeImport??>
-        import ${field.typeConfig.typeImport};
+import ${field.typeConfig.typeImport};
     </#if>
 </#list>
 
@@ -27,7 +30,8 @@ public class ${javaClassName} {
     private static Map<Integer, ${javaClassName}> configs;
     private static List<${javaClassName}> configList;
 
-    public static void onReloadConfig(Map<Integer, ${javaClassName}> configMap){
+    public static void reloadConfig(${javaSourceClassName} dataSource){
+        Map<Integer, ${javaClassName}> configMap = DataConfigUtil.reloadConfig(dataSource, ${javaClassName}.class, ${javaClassName}::getPrimaryId);
 
         List<${javaClassName}> configList = configMap.values().stream().sorted(Comparator.comparing(${javaClassName}::getPrimaryId))
         .collect(Collectors.toList());
@@ -58,9 +62,9 @@ public class ${javaClassName} {
     *
     * **/
 
-    private final T_activity193_mainData data;
+    private final ${javaDataClassName} data;
 
-    public ${javaClassName}(T_activity193_mainData data) {
+    public ${javaClassName}(${javaDataClassName} data) {
         this.data = data;
     }
 

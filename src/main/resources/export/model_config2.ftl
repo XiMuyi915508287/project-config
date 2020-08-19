@@ -1,8 +1,10 @@
 package ${javaPackage};
 
-import com.game.common.util.CommonUtil;
+import com.project.config.DataConfigUtil;
 import com.project.config.DataPrimaryKey;
+
 import ${javaDataPackage}.${javaDataClassName};
+import ${javaDataPackage}.${javaSourceClassName};
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,13 +33,19 @@ public class ${javaClassName} {
     private static List<${javaClassName}> configList;
     private static Map<Integer, List<${javaClassName}>> primary2Configs;
 
-    public static void onReloadConfig(Map<DataPrimaryKey, ${javaClassName}> configMap){
+    public static void reloadConfig(${javaSourceClassName} dataSource){
+        Map<DataPrimaryKey, ${javaClassName}> configMap = DataConfigUtil.reloadConfig(dataSource, ${javaClassName}.class, ${javaClassName}::getPrimaryKey);
 
         List<${javaClassName}> configList = configMap.values().stream().sorted(Comparator.comparingLong(actConfig -> actConfig.primaryKey.getLongKey()))
-        .collect(Collectors.toList());
+            .collect(Collectors.toList());
+
+        Map<Integer, List<${javaClassName}>> listMap = new HashMap<>();
+        for (${javaClassName} config : configList) {
+            List<${javaClassName}> configs = listMap.computeIfAbsent(config.primaryKey.getPrimaryId(), key -> new ArrayList<>());
+            configs.add(config);
+        }
 
         Map<Integer, List<${javaClassName}>> primary2Configs = new HashMap<>();
-        Map<Integer, List<${javaClassName}>> listMap = CommonUtil.group2Collection(new HashMap<>(), configMap.values(), ArrayList::new, actConfig -> actConfig.primaryKey.getPrimaryId());
         for (Map.Entry<Integer, List<${javaClassName}>> entry : listMap.entrySet()) {
             entry.getValue().sort(Comparator.comparingInt(actConfig -> actConfig.primaryKey.getSecondaryId()));
             primary2Configs.put(entry.getKey(), Collections.unmodifiableList(entry.getValue()));
