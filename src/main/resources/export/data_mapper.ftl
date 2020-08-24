@@ -5,7 +5,7 @@ import com.project.config.IDataSource;
 import ${classConfig.dataClass.name};
 </#list>
 <#list classConfigList as classConfig>
-    import ${classConfig.configClass.name};
+import ${classConfig.configClass.name};
 </#list>
 
 import org.slf4j.Logger;
