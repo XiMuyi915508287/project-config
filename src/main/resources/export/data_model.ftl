@@ -16,6 +16,7 @@ import ${field.typeConfig.typeImport};
 public class ${javaClassName} {
 
 <#list fieldList as field>
+    /** ${field.fieldConfig.annotation} **/
     private ${field.typeConfig.typeClass} ${field.fieldConfig.name};
 </#list>
 
@@ -28,8 +29,8 @@ public class ${javaClassName} {
         return ${field.fieldConfig.name};
     }
 
-    public void ${field.fieldConfig.methodSet}(${field.typeConfig.typeClass} ${field.fieldConfig.name}){
-        this.${field.fieldConfig.name} = ${field.fieldConfig.name};
-    }
+    <#--public void ${field.fieldConfig.methodSet}(${field.typeConfig.typeClass} ${field.fieldConfig.name}){-->
+        <#--this.${field.fieldConfig.name} = ${field.fieldConfig.name};-->
+    <#--}-->
 </#list>
 }

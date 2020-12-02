@@ -33,6 +33,14 @@ public class ${javaClassName} {
     private static List<${javaClassName}> configList;
     private static Map<Integer, List<${javaClassName}>> primary2Configs;
 
+    static {
+        reloadConfig(DataConfigs.getDataSource(${javaSourceClassName}.class));
+    }
+
+    public static void touch(){
+
+    }
+
     public static void reloadConfig(${javaSourceClassName} dataSource){
         Map<DataPrimaryKey, ${javaClassName}> configMap = DataConfigUtil.reloadConfig(dataSource, ${javaClassName}.class, ${javaClassName}::getPrimaryKey);
 

@@ -21,25 +21,23 @@ public class DataConfigUtil {
 	 * @param <S>
 	 * @param <T>
 	 * @param <K>
-	 * @return 加载失败返回 null.
+	 * @return
 	 */
 	public static <S extends IDataSource, T, K> Map<K, T> reloadConfig(S dataSource, Class<T> tClass, Function<T, K> function){
-		Map<K, T> configs = null;
 		try {
 			Method method = dataSource.getClass().getSuperclass().getDeclaredMethod("getDataList");
 			List dataList = (List) method.invoke(dataSource);
-			Map<K, T> map = new HashMap<>(dataList.size());
+			Map<K, T> configs = new HashMap<>(dataList.size());
 			for (Object data : dataList) {
 				Constructor<T> constructor = tClass.getDeclaredConstructor(data.getClass());
 				constructor.setAccessible(true);
 				T config = constructor.newInstance(data);
-				map.put(function.apply(config), config);
+				configs.put(function.apply(config), config);
 			}
-			configs = map;
+			return configs;
 		}
 		catch (Throwable e) {
-			logger.error("reload data source:[{}] error.", dataSource.getName(), e);
+			throw new RuntimeException("reload data source:" + dataSource.getName(), e);
 		}
-		return configs;
 	}
 }
