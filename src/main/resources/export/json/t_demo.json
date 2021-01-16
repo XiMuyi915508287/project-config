@@ -1,9 +1,0 @@
-[
-	{"activityId":10156,"product":"1#11249999#10","cost":"2#29#0","name":"调料信物","maxOnce":1,"id":1,"type":"1:50_40","maxCount":1,"desc":"<color=#ffaf67>【九奏碧霄】召唤阵</color>召唤50次后免费领取（▩1%d/50）"},
-	{"activityId":10156,"product":"1#11249999#15","cost":"2#29#0","name":"调料信物","maxOnce":1,"id":2,"type":"1:100_40","maxCount":1,"desc":"<color=#ffaf67>【九奏碧霄】召唤阵</color>召唤100次后免费领取（▩1%d/100）"},
-	{"activityId":10156,"product":"1#11240096#5","cost":"2#29#0","name":"素蒸音声部信物","maxOnce":1,"id":3,"type":"1:150_40","maxCount":1,"desc":"<color=#ffaf67>【九奏碧霄】召唤阵</color>召唤150次后免费领取（▩1%d/150）"},
-	{"activityId":10156,"product":"4#2097#1","cost":"2#29#240","name":"新风鳗鲞","maxOnce":1,"id":4,"maxCount":1},
-	{"activityId":10156,"product":"4#2096#1","cost":"2#29#300","name":"素蒸音声部","maxOnce":1,"id":5,"maxCount":1},
-	{"activityId":10156,"product":"1#11320024#1","cost":"2#29#100","name":"随机御品食魂","maxOnce":1,"id":6,"maxCount":1},
-	{"activityId":10156,"product":"1#11320069#1","cost":"2#29#150","name":"自选御品食魂","maxOnce":1,"id":7,"maxCount":1}
-]

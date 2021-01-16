@@ -1,8 +1,10 @@
 package com.project.config;
 
+import java.io.IOException;
+
 public interface IDataSource {
 
 	String getName();
 
-	void loadJson(String jsonString) ;
+	void loadFile(String filePath) throws IOException;
 }

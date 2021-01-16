@@ -2,7 +2,10 @@ package com.project.config;
 
 import com.alibaba.fastjson.parser.DefaultJSONParser;
 import com.alibaba.fastjson.parser.ParserConfig;
+import jodd.io.FileUtil;
+import jodd.util.StringUtil;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +23,9 @@ public abstract class DataSource<T> implements IDataSource {
 	}
 
 	@Override
-	public void loadJson(String jsonString) {
+	public void loadFile(String filePath) throws IOException {
+		String[] readLines = FileUtil.readLines(filePath, "UTF-8");
+		String jsonString = StringUtil.join(readLines, "\n");
 		DefaultJSONParser parser = new DefaultJSONParser(jsonString, new ParserConfig(true));
 		ArrayList<T> dataList = new ArrayList<>();
 		parser.parseArray(getJsonClass(), dataList);
