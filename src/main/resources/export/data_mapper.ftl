@@ -48,13 +48,32 @@ public class DataMapper {
         }
     }
 
-    static void onDataSourceReload(IDataSource dataSource) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    static void reloadDataSource(IDataSource dataSource)  {
         ConfigClass configClass = name2ConfigClass.get(dataSource.getName());
         if (configClass == null){
             return;
         }
-        Method method = configClass.getConfigClass().getMethod("reloadConfig", dataSource.getClass());
-        method.invoke(null, dataSource);
+        try {
+            Method method = configClass.getConfigClass().getMethod("reloadConfig", dataSource.getClass(), String.class);
+            method.invoke(null, dataSource, "RELOAD");
+        }
+        catch (Throwable e) {
+            logger.error("dataClass:{} ConfigClass:{}", configClass.getName(), configClass.getName(), e);
+        }
+    }
+
+    static void touchDataSource(IDataSource dataSource)  {
+        ConfigClass configClass = name2ConfigClass.get(dataSource.getName());
+        if (configClass == null){
+            return;
+        }
+        try {
+            Method method = configClass.getConfigClass().getMethod("touch");
+            method.invoke(null);
+        }
+        catch (Throwable e) {
+            logger.error("dataClass:{} ConfigClass:{}", configClass.getName(), configClass.getName(), e);
+        }
     }
 
     public static class ConfigClass {
