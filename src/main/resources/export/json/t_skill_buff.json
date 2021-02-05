@@ -1,0 +1,9 @@
+[
+	{"id":301001,"iconId":"atk_add","name":"攻击增强","generaId":1,"type":1,"condition":0,"value":250,"maxRound":0,"features":"[{\"type\":\"Attribute\", \"attr\":\"atk\", \"rate\":250}]"},
+	{"id":301005,"iconId":"dodge_add","name":"闪避增强","generaId":1,"type":5,"condition":0,"value":700,"maxRound":0,"features":"[{\"type\":\"Attribute\", \"attr\":\"dodge\", \"value\":300}]"},
+	{"id":301007,"iconId":"healing","name":"治疗","generaId":1,"type":7,"condition":23,"value":150,"maxRound":0,"features":"[{\"type\":\"Heal\", \"rate\":150}]"},
+	{"id":301009,"iconId":"shield","effectId":"battle_shield","name":"护盾","generaId":1,"type":9,"condition":0,"value":150,"maxRound":0,"features":"[{\"type\":\"Shield\", \"value\":\"caster.thp*0.15\"}]"},
+	{"id":301021,"iconId":"dizzy","effectId":"battle_dizzy","name":"晕眩","generaId":2,"type":21,"condition":0,"value":0,"maxRound":0,"features":"[{\"type\":\"Dizzy\"}]"},
+	{"id":301013,"iconId":"invincible","effectId":"battle_invincible","name":"金身","generaId":1,"type":13,"condition":17,"value":0,"maxRound":0,"features":"[{\"type\":\"Invincible\"}]"},
+	{"id":301014,"iconId":"atk_less","name":"攻击降低","generaId":2,"type":14,"condition":0,"value":300,"maxRound":0,"features":"[{\"type\":\"Attribute\", \"attr\":\"atk\", \"rate\":-300}]"}
+]

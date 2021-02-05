@@ -1,0 +1,5 @@
+[
+	{"id":0,"comment":"无条件","type":"None","param":"0"},
+	{"id":4,"comment":"目标生命低于50%","type":"TargetHpRateBelow","param":"500"},
+	{"id":24,"comment":"技能命中时","type":"HitTarget","param":"0"}
+]
