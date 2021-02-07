@@ -1,7 +1,9 @@
 [
-	{"id":10020,"name":"AddBuff","comment":"附加BUFF, ID+回合","executeOccasion":3,"hitOrResistEffect":false},
-	{"id":10050,"name":"Heal","comment":"X，Y，Z(1000表示100%)\n瞬回血(治疗)X%+自身攻击*系数Y+自身生命*系数Z","executeOccasion":3,"hitOrResistEffect":false},
-	{"id":10180,"name":"RemoveBuff","comment":"X,Y 清除X个Y面状态的BUFF","executeOccasion":0,"hitOrResistEffect":false},
+	{"id":0,"name":"None","comment":"无","executeOccasion":0,"hitOrResistEffect":false},
+	{"id":10020,"name":"AddBuff","comment":"附加BUFFX回合Y","executeOccasion":3,"hitOrResistEffect":false},
+	{"id":10050,"name":"Heal","comment":"瞬回血(治疗)X%+自身攻击*系数Y+自身生命*系数Z","executeOccasion":3,"hitOrResistEffect":false},
+	{"id":10180,"name":"RemoveBuff","comment":"清除X个Y面状态的BUFF","executeOccasion":0,"hitOrResistEffect":false},
+	{"id":10190,"name":"ChangeBuffDuration","comment":"延长Y面X回合","executeOccasion":3,"hitOrResistEffect":true},
 	{"id":10210,"name":"HealToHigherHpRate","comment":"治疗至与生命较高一方","executeOccasion":3,"hitOrResistEffect":false},
-	{"id":10251,"name":"CastSkillId","comment":"释放技能 X,Y,Z,A,B,C,D","executeOccasion":0,"hitOrResistEffect":false}
+	{"id":10251,"name":"CastSkillId","comment":"释放技能","executeOccasion":0,"hitOrResistEffect":false}
 ]
